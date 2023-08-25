@@ -1,0 +1,17 @@
+---
+- name: User Creation with password
+  hosts: prod
+  become: yes
+  vars_files:
+    user_list.yml
+  tasks:
+    - name: User Creation Play
+      vars:
+        password: "{{ lookup('passwrod','filnema-'+item.name+' length=7') }}"
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        uid: "{{ item.uid }}"
+        state: present
+        password: "{{ password|password_hash('sha512') }}"
+        comment: "{{ item.first|capitalize }} {{ item.middle|capitalize }} {{ item.last|capitalize }} "
+      loop: "{{ users }}"
